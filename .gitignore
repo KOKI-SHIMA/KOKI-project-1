@@ -1,0 +1,23 @@
+# Copyrighted character images
+data/characters/*
+
+# Camera and test images
+data/test/*
+
+# Generated results
+output/*
+
+# Downloaded AI models
+models/*
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Python virtual environments
+.venv/
+venv/
+
+# Operating system files
+.DS_Store
+Thumbs.db
