@@ -49,16 +49,23 @@ if not QUERY_PATH.exists():
         f"Query image not found: {QUERY_PATH}"
     )
 
-character_paths = sorted(
+if not CHARACTER_DIRECTORY.exists():
+    raise RuntimeError(
+        f"Character directory not found: "
+        f"{CHARACTER_DIRECTORY}"
+    )
+
+
+# characterごとのfolderを探す
+character_directories = sorted(
     path
     for path in CHARACTER_DIRECTORY.iterdir()
-    if path.is_file()
-    and path.suffix.lower() in SUPPORTED_EXTENSIONS
+    if path.is_dir()
 )
 
-if len(character_paths) < 3:
+if len(character_directories) < 3:
     raise RuntimeError(
-        "Add at least 3 character images."
+        "Add at least 3 character folders."
     )
 
 
@@ -86,28 +93,17 @@ model, preprocess = clip.load(
 model.eval()
 
 
+# 撮影した顔画像をCLIP用のTensorに変換
 query_tensor = prepare_image(
     QUERY_PATH,
     preprocess,
 ).unsqueeze(0).to(device)
-
-character_tensors = torch.stack(
-    [
-        prepare_image(path, preprocess)
-        for path in character_paths
-    ]
-).to(device)
 
 
 with torch.no_grad():
     query_features = model.encode_image(
         query_tensor
     )
-
-    character_features = model.encode_image(
-        character_tensors
-    )
-
 
 query_features = (
     query_features
@@ -117,15 +113,109 @@ query_features = (
     )
 )
 
-character_features = (
-    character_features
-    / character_features.norm(
-        dim=-1,
+
+character_names = []
+character_features_list = []
+character_image_counts = []
+
+
+# 各characterのfolderを順番に処理
+for character_directory in character_directories:
+    image_paths = sorted(
+        path
+        for path in character_directory.iterdir()
+        if path.is_file()
+        and path.suffix.lower() in SUPPORTED_EXTENSIONS
+    )
+
+    valid_tensors = []
+
+    for image_path in image_paths:
+        try:
+            image_tensor = prepare_image(
+                image_path,
+                preprocess,
+            )
+            valid_tensors.append(image_tensor)
+
+        except Exception as error:
+            print(
+                f"Warning: Could not read "
+                f"{image_path.name}: {error}"
+            )
+
+    if not valid_tensors:
+        print(
+            f"Warning: No valid images in "
+            f"{character_directory.name}"
+        )
+        continue
+
+    image_batch = torch.stack(
+        valid_tensors
+    ).to(device)
+
+    with torch.no_grad():
+        image_features = model.encode_image(
+            image_batch
+        )
+
+    # 各画像の特徴をnormalize
+    image_features = (
+        image_features
+        / image_features.norm(
+            dim=-1,
+            keepdim=True,
+        )
+    )
+
+    # 同じcharacterの複数画像から平均特徴を作る
+    average_features = image_features.mean(
+        dim=0,
         keepdim=True,
     )
+
+    # 平均後にもう一度normalize
+    average_features = (
+        average_features
+        / average_features.norm(
+            dim=-1,
+            keepdim=True,
+        )
+    )
+
+    character_names.append(
+        character_directory.name
+    )
+
+    character_features_list.append(
+        average_features
+    )
+
+    character_image_counts.append(
+        len(valid_tensors)
+    )
+
+    print(
+        f"Loaded {len(valid_tensors)} image(s): "
+        f"{character_directory.name}"
+    )
+
+
+if len(character_features_list) < 3:
+    raise RuntimeError(
+        "At least 3 character folders must "
+        "contain valid images."
+    )
+
+
+character_features = torch.cat(
+    character_features_list,
+    dim=0,
 )
 
 
+# Queryと各characterの平均特徴を比較
 similarities = (
     query_features
     @ character_features.T
@@ -134,7 +224,7 @@ similarities = (
 
 top_count = min(
     3,
-    len(character_paths),
+    len(character_names),
 )
 
 top_values, top_indices = similarities.topk(
@@ -147,8 +237,8 @@ RESULT_PATH.parent.mkdir(
     exist_ok=True,
 )
 
-
 results = []
+
 
 for rank, (score, index) in enumerate(
     zip(
@@ -157,11 +247,9 @@ for rank, (score, index) in enumerate(
     ),
     start=1,
 ):
-    character_path = character_paths[index]
-
     result = {
         "rank": rank,
-        "character": character_path.stem,
+        "character": character_names[index],
         "cosine_similarity": score,
     }
 
@@ -189,11 +277,21 @@ with RESULT_PATH.open(
 print("\nTop 3 results")
 
 for result in results:
+    character_index = character_names.index(
+        result["character"]
+    )
+
+    image_count = character_image_counts[
+        character_index
+    ]
+
     print(
         f"{result['rank']}. "
         f"{result['character']} "
         f"(similarity: "
-        f"{result['cosine_similarity']:.4f})"
+        f"{result['cosine_similarity']:.4f}, "
+        f"images: {image_count})"
     )
+
 
 print(f"\nResults saved: {RESULT_PATH}")
