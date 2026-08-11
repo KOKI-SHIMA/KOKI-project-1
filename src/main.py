@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 import subprocess
 import sys
 
@@ -14,14 +15,24 @@ INPUT_PATH = (
     / "input.jpg"
 )
 
+CAPTURE_SCRIPT = (
+    PROJECT_DIRECTORY
+    / "src"
+    / "capture.py"
+)
+
 PROCESS_STEPS = [
     (
         "Face detection",
-        PROJECT_DIRECTORY / "src" / "detect_face.py",
+        PROJECT_DIRECTORY
+        / "src"
+        / "detect_face.py",
     ),
     (
         "CLIP comparison",
-        PROJECT_DIRECTORY / "src" / "compare_clip.py",
+        PROJECT_DIRECTORY
+        / "src"
+        / "compare_clip.py",
     ),
     (
         "Result page",
@@ -32,18 +43,13 @@ PROCESS_STEPS = [
 ]
 
 
-if not INPUT_PATH.exists():
-    raise RuntimeError(
-        f"Input image not found: {INPUT_PATH}"
-    )
-
-
-print("AnimeTwin")
-print(f"Input: {INPUT_PATH}")
-
-
-for step_name, script_path in PROCESS_STEPS:
+def run_script(step_name, script_path):
     print(f"\n--- {step_name} ---")
+
+    if not script_path.exists():
+        raise RuntimeError(
+            f"Script not found: {script_path}"
+        )
 
     try:
         subprocess.run(
@@ -62,6 +68,54 @@ for step_name, script_path in PROCESS_STEPS:
         )
 
         sys.exit(error.returncode)
+
+
+parser = argparse.ArgumentParser(
+    description=(
+        "Capture a face and find similar "
+        "anime characters."
+    )
+)
+
+parser.add_argument(
+    "--no-capture",
+    action="store_true",
+    help=(
+        "Use the existing input.jpg "
+        "without taking a new photo."
+    ),
+)
+
+args = parser.parse_args()
+
+
+print("AnimeTwin")
+
+
+if args.no_capture:
+    print("Camera capture: skipped")
+
+else:
+    run_script(
+        "Camera capture",
+        CAPTURE_SCRIPT,
+    )
+
+
+if not INPUT_PATH.exists():
+    raise RuntimeError(
+        f"Input image not found: {INPUT_PATH}"
+    )
+
+
+print(f"Input: {INPUT_PATH}")
+
+
+for step_name, script_path in PROCESS_STEPS:
+    run_script(
+        step_name,
+        script_path,
+    )
 
 
 print("\nAnimeTwin completed successfully.")
