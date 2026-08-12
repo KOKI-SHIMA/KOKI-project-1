@@ -71,6 +71,111 @@ anime-twin/
 └── .gitignore
 ```
 
+## Tested Environment
+
+This project was tested with:
+
+- NVIDIA Jetson Orin Nano
+- JetPack 6.0
+- L4T 36.3.0
+- CUDA 12.2
+- Python 3
+- PyTorch 2.2.0
+- OpenCV 4.8.1
+- USB V4L2 camera
+
+Other environments may require different package versions.
+
+## Installation
+
+### 1. Install jetson-containers
+
+Follow the official installation instructions:
+
+```bash
+git clone https://github.com/dusty-nv/jetson-containers
+bash jetson-containers/install.sh
+```
+
+### 2. Clone AnimeTwin
+
+```bash
+cd /home/nvidia
+git clone https://github.com/KOKI-SHIMA/KOKI-project-1.git anime-twin
+cd anime-twin
+```
+
+### 3. Create the Local Directories
+
+Images, downloaded models, and generated results are excluded from GitHub. Create their directories manually:
+
+```bash
+mkdir -p data/characters
+mkdir -p data/test
+mkdir -p models/clip
+mkdir -p output
+```
+
+### 4. Start the PyTorch Container
+
+```bash
+jetson-containers run \
+  --name anime-twin \
+  --volume /home/nvidia/anime-twin:/workspace/anime-twin \
+  $(autotag l4t-pytorch)
+```
+
+The commands below should be executed inside the container.
+
+### 5. Install the Additional Python Packages
+
+```bash
+cd /workspace/anime-twin
+python3 -m pip install -r requirements.txt
+```
+
+Install OpenAI CLIP from its official repository:
+
+```bash
+python3 -m pip install --no-deps \
+  git+https://github.com/openai/CLIP.git
+```
+
+If the NVIDIA package index cannot be reached, use the public PyPI index:
+
+```bash
+env -u PIP_INDEX_URL \
+  -u PIP_EXTRA_INDEX_URL \
+  PIP_CONFIG_FILE=/dev/null \
+  python3 -m pip install \
+  --index-url https://pypi.org/simple \
+  -r requirements.txt
+```
+
+### 6. Download the YuNet Model
+
+```bash
+wget \
+  -O models/face_detection_yunet_2023mar.onnx \
+  https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx
+```
+
+Confirm that the model was downloaded:
+
+```bash
+ls -lh models/face_detection_yunet_2023mar.onnx
+```
+
+### 7. Add Reference Images
+
+Before running AnimeTwin, add at least three reference folders to:
+
+```text
+data/characters/
+```
+
+Each folder must contain at least one supported image. Using three to five images per category is recommended.
+
 ## Preparing the Reference Dataset
 
 Reference images are not included in this repository. Before running the program, users must add their own images locally.
