@@ -34,12 +34,6 @@ PROCESS_STEPS = [
         / "src"
         / "compare_clip.py",
     ),
-    (
-        "Result page",
-        PROJECT_DIRECTORY
-        / "src"
-        / "create_result_page.py",
-    ),
 ]
 
 
@@ -72,8 +66,8 @@ def run_script(step_name, script_path):
 
 parser = argparse.ArgumentParser(
     description=(
-        "Capture a face and find similar "
-        "anime characters."
+        "Capture a face and find visually "
+        "similar anime characters."
     )
 )
 
@@ -124,10 +118,4 @@ print(
     "CSV result: "
     "/workspace/anime-twin/output/"
     "clip_results.csv"
-)
-
-print(
-    "HTML result: "
-    "/workspace/anime-twin/output/"
-    "result.html"
 )

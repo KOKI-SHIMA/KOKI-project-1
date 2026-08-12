@@ -1,18 +1,33 @@
 # AnimeTwin
 
-AnimeTwinは、撮影した人物の顔と見た目が似ているアニメキャラクターを、AIを使って探すプログラムです。
+AnimeTwin is an AI-powered visual similarity project built for the NVIDIA Jetson Orin Nano.
 
-このプロジェクトは、NVIDIA Jetson Orin Nano上で動作します。
+The program captures a portrait using a USB camera, detects and crops the face, compares its visual features with a local anime character dataset, and displays the Top 3 results in the terminal.
 
-## 仕組み
+## Features
 
-1. USB cameraで写真を撮影します。
-2. OpenCV YuNetを使って顔を検出し、顔の部分を切り取ります。
-3. OpenAI CLIPを使って、顔画像の視覚的な特徴を数値に変換します。
-4. 人物の顔と、localに保存されたキャラクター画像を比較します。
-5. 類似度が高い上位3人をHTMLの結果画面に表示します。
+- Captures an image using a USB camera
+- Detects faces with OpenCV YuNet
+- Automatically crops the detected face
+- Extracts visual features using OpenAI CLIP
+- Supports multiple reference images for each character
+- Calculates an average feature vector for each character
+- Displays the Top 3 results in the terminal
+- Saves the complete ranking as a CSV file
+- Runs the complete pipeline with one command
 
-## 使用技術
+## How It Works
+
+1. The USB camera captures an image.
+2. YuNet detects the largest face in the image.
+3. The detected face is cropped.
+4. CLIP converts the face image into a feature vector.
+5. CLIP also converts the character images into feature vectors.
+6. The program calculates an average vector for each character.
+7. Cosine similarity is used to rank the characters.
+8. The Top 3 results are displayed in the terminal.
+
+## Technologies
 
 - NVIDIA Jetson Orin Nano
 - Python
@@ -22,58 +37,107 @@ AnimeTwinは、撮影した人物の顔と見た目が似ているアニメキ�
 - YuNet
 - OpenAI CLIP
 - Docker
+- jetson-containers
 
-## File構成
+## Project Structure
 
-- `src/capture.py`：USB cameraで写真を撮影します。
-- `src/detect_face.py`：写真から顔を検出して切り取ります。
-- `src/compare_clip.py`：CLIPを使って画像の特徴を比較します。
-- `src/create_result_page.py`：比較結果をHTMLに変換します。
-- `src/main.py`：すべての処理を順番に実行します。
-- `requirements.txt`：追加で必要なPython packageを記録しています。
+```text
+anime-twin/
+├── src/
+│   ├── capture.py
+│   ├── detect_face.py
+│   ├── compare_clip.py
+│   └── main.py
+├── data/
+│   ├── characters/
+│   └── test/
+├── models/
+├── output/
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
 
-## 実行方法
+## Character Dataset
 
-JetsonのDocker container内で、次のcommandを実行します。
+Create one folder for each character inside `data/characters`.
+
+```text
+data/characters/
+├── character_a/
+│   ├── image_01.jpg
+│   ├── image_02.jpg
+│   └── image_03.jpg
+└── character_b/
+    ├── image_01.jpg
+    ├── image_02.jpg
+    └── image_03.jpg
+```
+
+The folder name is used as the character name in the results.
+
+Supported image formats:
+
+- JPG
+- JPEG
+- PNG
+- WebP
+
+## Run the Program
+
+Run the following command inside the Docker container:
 
 ```bash
 cd /workspace/anime-twin
 python3 src/main.py
 ```
 
-結果画面を公開するために、次のcommandを実行します。
+The program will automatically:
+
+1. Capture an image
+2. Detect and crop the face
+3. Compare the image with the character dataset
+4. Display the Top 3 results
+
+To reuse the existing input image without taking a new photo:
 
 ```bash
-python3 -m http.server 8000 --directory /workspace/anime-twin/output
+python3 src/main.py --no-capture
 ```
 
-同じnetworkに接続したPCのbrowserで、次のURLを開きます。
+## Output
+
+The ranking is displayed directly in the terminal.
+
+Example:
 
 ```text
-http://JETSON_IP_ADDRESS:8000/result.html
+Top 3 results
+1. character_a (similarity: 0.5850, images: 3)
+2. character_b (similarity: 0.5700, images: 3)
+3. character_c (similarity: 0.5500, images: 3)
 ```
 
-現在の環境では、次のURLを使用します。
+The complete results are also saved to:
 
 ```text
-http://192.168.137.199:8000/result.html
+output/clip_results.csv
 ```
 
-## 出力されるFile
+## Important Notes
 
-- `output/face_crop.jpg`：切り取られた顔画像
-- `output/face_detected.jpg`：顔の検出位置を示した画像
-- `output/clip_results.csv`：キャラクターとの類似度
-- `output/result.html`：最終結果画面
+- Cosine similarity is a similarity score, not a probability.
+- CLIP is a general-purpose image model and is not specifically trained for facial recognition.
+- Character images, captured photos, downloaded models, and generated results are not included in this repository.
+- Only images that can be used legally and ethically should be added to the local dataset.
+- Permission should be obtained before using a person's photograph.
 
-## 注意事項
+## Limitations
 
-- Cosine similarityは画像同士の特徴の近さを表す数値であり、確率ではありません。
-- このプログラムは「顔が完全に同じ」と判断するものではありません。
-- キャラクター画像、撮影画像、AI model、生成された結果はGitHubに公開しません。
-- 使用する画像について、著作権・肖像権・privacyに注意します。
-- 人物写真を使用する場合は、本人の許可を得ます。
+- Results depend on lighting, camera angle, image quality, and the reference dataset.
+- The program selects the closest match from the available characters.
+- The result does not prove that two faces are objectively identical.
 
-## 現在の状態
+## Project Status
 
-Prototype完成。
+Working prototype completed on NVIDIA Jetson Orin Nano.
