@@ -10,6 +10,26 @@ This video demonstrates the complete AnimeTwin pipeline running on the NVIDIA Je
 
 [Watch the AnimeTwin demonstration video](https://drive.google.com/file/d/1kyNhTPseplqxdmkhCdjlsBTNwJhcE8sM/view?usp=sharing)
 
+## Project Screenshots
+
+### 1. Reference Dataset Structure
+
+Each character is stored in a separate folder, with multiple reference images used for comparison.
+
+ここへ1枚目をドラッグ＆ドロップ
+
+### 2. Top 3 Results
+
+AnimeTwin detected the face, compared it with the reference dataset, and displayed the Top 3 visually similar characters in the terminal.
+
+ここへ2枚目をドラッグ＆ドロップ
+
+### 3. Complete Hardware Setup
+
+The complete prototype uses an NVIDIA Jetson Orin Nano and a USB camera connected to the development computer.
+
+ここへ3枚目をドラッグ＆ドロップ
+
 ## Why This Project Matters
 
 Anime and manga have a large global audience. In March 2026, the official ONE PIECE website announced that the manga had surpassed 600 million copies in worldwide circulation, including more than 150 million copies outside Japan. This demonstrates the enormous international interest in anime characters and related experiences.
