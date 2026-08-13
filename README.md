@@ -28,7 +28,7 @@ AnimeTwin detected the face, compared it with the reference dataset, and display
 
 This screenshot shows the complete AnimeTwin development environment in Windows, including VS Code, the project files, and the terminal output.
 
-<img width="2559" height="1462" alt="Screenshot 2026-08-13 103716" src="https://github.com/user-attachments/assets/32750ef7-bd44-4282-8389-d3691d8d9457" />
+<img width="900" alt="Screenshot 2026-08-13 103716" src="https://github.com/user-attachments/assets/32750ef7-bd44-4282-8389-d3691d8d9457" />
 
 ## Why This Project Matters
 
