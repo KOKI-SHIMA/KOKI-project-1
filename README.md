@@ -16,19 +16,19 @@ This video demonstrates the complete AnimeTwin pipeline running on the NVIDIA Je
 
 Each character is stored in a separate folder, with multiple reference images used for comparison.
 
-ここへ1枚目をドラッグ＆ドロップ
+<img width="403" height="655" alt="Screenshot 2026-08-13 102555" src="https://github.com/user-attachments/assets/06388d98-c97d-48b9-8061-ba482b5e5911" />
 
 ### 2. Top 3 Results
 
 AnimeTwin detected the face, compared it with the reference dataset, and displayed the Top 3 visually similar characters in the terminal.
 
-ここへ2枚目をドラッグ＆ドロップ
+<img width="536" height="106" alt="Screenshot 2026-08-13 102619" src="https://github.com/user-attachments/assets/51bf8f4d-276b-435e-baf6-0d178c36cd78" />
 
 ### 3. Complete Development Environment
 
 This screenshot shows the complete AnimeTwin development environment in Windows, including VS Code, the project files, and the terminal output.
 
-ここへ3枚目をドラッグ＆ドロップ
+<img width="2559" height="1462" alt="Screenshot 2026-08-13 103716" src="https://github.com/user-attachments/assets/32750ef7-bd44-4282-8389-d3691d8d9457" />
 
 ## Why This Project Matters
 
