@@ -4,6 +4,12 @@ AnimeTwin is an AI-powered visual similarity project built for the NVIDIA Jetson
 
 The program captures a portrait using a USB camera, detects and crops the face, compares its visual features with a local anime character dataset, and displays the Top 3 results in the terminal.
 
+## Demo Video
+
+This video demonstrates the complete AnimeTwin pipeline running on the NVIDIA Jetson Orin Nano.
+
+[Watch the AnimeTwin demonstration video](https://drive.google.com/file/d/1kyNhTPseplqxdmkhCdjlsBTNwJhcE8sM/view?usp=sharing)
+
 ## Why This Project Matters
 
 Anime and manga have a large global audience. In March 2026, the official ONE PIECE website announced that the manga had surpassed 600 million copies in worldwide circulation, including more than 150 million copies outside Japan. This demonstrates the enormous international interest in anime characters and related experiences.
