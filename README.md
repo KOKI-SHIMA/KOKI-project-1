@@ -24,9 +24,9 @@ AnimeTwin detected the face, compared it with the reference dataset, and display
 
 ここへ2枚目をドラッグ＆ドロップ
 
-### 3. Complete Hardware Setup
+### 3. Complete Development Environment
 
-The complete prototype uses an NVIDIA Jetson Orin Nano and a USB camera connected to the development computer.
+This screenshot shows the complete AnimeTwin development environment in Windows, including VS Code, the project files, and the terminal output.
 
 ここへ3枚目をドラッグ＆ドロップ
 
